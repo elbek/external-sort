@@ -1,13 +1,11 @@
 package elb;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 
 /**
@@ -31,25 +29,28 @@ public class AppTest
         return new TestSuite(AppTest.class);
     }
 
-    /**
-     * Rigourous Test :-)
-     */
     public void testSort() throws IOException {
-        new ExternalSort(1000, new File("/test/input.txt")).sort();
-    }
-
-    public void testApp() throws IOException {
         File file = new File("/test/input.txt");
         file.createNewFile();
         BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
 
         while (true) {
             bw.write(nextInt(new Random(), Integer.MAX_VALUE) + "\n");
-            if (file.length() / (1024 * 1024) > 500) {
+            if (file.length() / (1024 * 1024) > 50) {
                 break;
             }
         }
         bw.close();
+
+        new ExternalSort(1000, new File("/test/input.txt")).sort();
+        BufferedReader reader = new BufferedReader(new FileReader(new File("/test/result.txt")));
+        String line;
+        int lastOne = Integer.MIN_VALUE;
+        while ((line = reader.readLine()) != null) {
+            Assert.assertTrue(Integer.parseInt(line) >= lastOne);
+            lastOne = Integer.parseInt(line);
+        }
+
     }
 
     int nextInt(Random rng, int n) {
@@ -57,7 +58,6 @@ public class AppTest
     }
 
     long nextLong(Random rng, long n) {
-        // error checking and 2^x checking removed for simplicity.
         long bits, val;
         do {
             bits = (rng.nextLong() << 1) >>> 1;
